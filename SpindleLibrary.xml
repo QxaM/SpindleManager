@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T11:31:50.4211547" />
-  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-11T11:31:29.2813486" organization="Induprogress" author="Piotr Gliszczyński">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T15:29:05.4313573" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-11T15:28:19.1079797" organization="Induprogress" author="Piotr Gliszczyński">
     <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
@@ -74,6 +74,7 @@
               <value name="WORKING_CCW" />
               <value name="STOPPING" />
               <value name="ERROR" />
+              <value name="DEFAULT" value="9999" />
             </values>
           </enum>
         </baseType>
@@ -98,6 +99,12 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">i_runCW : BOOL;
+i_runCCW : BOOL;
+i_reset : BOOL;
+i_targetVelocity : INT;</xhtml>
+              </documentation>
             </variable>
             <variable name="i_drivePowerON">
               <type>
@@ -112,6 +119,11 @@
             <variable name="i_driveTargetReached">
               <type>
                 <BOOL />
+              </type>
+            </variable>
+            <variable name="i_driveActualVelocity">
+              <type>
+                <INT />
               </type>
             </variable>
           </inputVars>
@@ -172,6 +184,21 @@ END_IF</xhtml>
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveEnable := TRUE;</xhtml>
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="runSpindle" ObjectId="aba2bb6a-d5d4-4ac4-ad0e-f0e5754b6af9">
               <interface>
                 <returnType>
@@ -194,6 +221,17 @@ END_IF</xhtml>
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0">
+              <interface />
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveAnalogCommand := 0;</xhtml>
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5">
               <interface />
               <body>
@@ -205,26 +243,18 @@ END_IF</xhtml>
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627">
+            <Method name="update" ObjectId="f0d9947b-4fbb-4cc4-a5c0-37bbcbdc6adf">
               <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
+                <addData>
+                  <data name="http://www.3s-software.com/plcopenxml/accessmodifiers" handleUnknown="implementation">
+                    <AccessModifiers Protected="true" />
+                  </data>
+                </addData>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveEnable := TRUE;</xhtml>
-                </ST>
-              </body>
-              <addData />
-            </Method>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0">
-              <interface />
-              <body>
-                <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveAnalogCommand := 0;</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SUPER^.update();
+THIS^.i_driveActualVelocity := THIS^.q_actualVelocity;</xhtml>
                 </ST>
               </body>
               <addData />
@@ -363,7 +393,7 @@ END_IF</xhtml>
                 <derived name="SpindleMaganerStatus_e" />
               </type>
               <initialValue>
-                <simpleValue value="Constants.SP_DEFAULT_STATUS" />
+                <simpleValue value="9999" />
               </initialValue>
             </variable>
             <variable name="nextStatus">
@@ -382,9 +412,6 @@ END_IF</xhtml>
                 <Implements>RampsInterface</Implements>
                 <Implements>MotionInterface</Implements>
               </Inheritance>
-            </data>
-            <data name="http://www.3s-software.com/plcopenxml/accessmodifiers" handleUnknown="implementation">
-              <AccessModifiers Internal="true" />
             </data>
           </addData>
         </interface>
@@ -428,7 +455,7 @@ IF isError THEN
 	nextStatus := SpindleMaganerStatus_e.ERROR;
 END_IF
 
-IF wasChanged THEN
+IF wasChanged() THEN
 	writeRamps();
 END_IF
 
@@ -460,6 +487,8 @@ THIS^.q_spindleTargetReached := isSpindleTargetReached;</xhtml>
 			THIS^.nextStatus := SpindleMaganerStatus_e.STANDBY;
 		END_IF
 	END_IF
+ELSE
+	THIS^.nextStatus := SpindleMaganerStatus_e.STANDBY;
 END_IF</xhtml>
                 </ST>
               </body>
@@ -468,7 +497,11 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="errorReset" ObjectId="1ae55ce3-8c7a-4577-8711-80fe5c21c301">
-              <interface />
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -555,7 +588,11 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOn" ObjectId="f33f9a84-6c5d-4c7a-a720-0c5bf4ee03c5">
-              <interface />
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -690,7 +727,10 @@ END_IF</xhtml>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">IF THIS^.i_reset THEN
 	THIS^.nextStatus:= SpindleMaganerStatus_e.INIT;
-END_IF</xhtml>
+END_IF
+stopSpindle();
+setPowerOff();
+</xhtml>
                 </ST>
               </body>
               <addData />
@@ -795,10 +835,10 @@ END_IF</xhtml>
         </variable>
         <variable name="SP_DEFAULT_STATUS">
           <type>
-            <UINT />
+            <derived name="SpindleMaganerStatus_e" />
           </type>
           <initialValue>
-            <simpleValue value="9999" />
+            <simpleValue value="SpindleMaganerStatus_e.DEFAULT" />
           </initialValue>
         </variable>
         <addData>
@@ -846,7 +886,11 @@ END_IF</xhtml>
       <Interface name="ErrorInterface" ObjectId="7f29e168-bb89-495a-a3ae-8cb75aa464ff">
         <Methods>
           <Method name="errorReset" ObjectId="d1ceed18-4c4a-4176-a9e3-72527fe56f59">
-            <interface />
+            <interface>
+              <returnType>
+                <BOOL />
+              </returnType>
+            </interface>
             <addData />
           </Method>
         </Methods>
@@ -1006,18 +1050,19 @@ END_IF</xhtml>
             </Object>
             <Object Name="AnalogSpindle" ObjectId="eb76969c-c174-4116-a74f-1f579b1c095f">
               <Folder Name="ErrorInterface">
-                <Object Name="errorReset" ObjectId="4c45ac57-8867-45ba-b93f-2cb214b4ff31" />
                 <Object Name="isError" ObjectId="91da8d3f-395f-407d-a40c-7c7ee066fe17" />
+                <Object Name="errorReset" ObjectId="4c45ac57-8867-45ba-b93f-2cb214b4ff31" />
               </Folder>
               <Folder Name="MotionInterface">
-                <Object Name="runSpindle" ObjectId="aba2bb6a-d5d4-4ac4-ad0e-f0e5754b6af9" />
-                <Object Name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5" />
-                <Object Name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627" />
                 <Object Name="isPowerOn" ObjectId="256c28d3-fce5-4145-8014-8183b5b90b60" />
-                <Object Name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0" />
                 <Object Name="isSpindleStopped" ObjectId="1f638665-ba1e-4c52-8d8f-f59eeb4a81e8" />
                 <Object Name="isSpindleTargetReached" ObjectId="2e54a297-7a82-4ff6-8957-ba66aeebbcae" />
+                <Object Name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627" />
+                <Object Name="runSpindle" ObjectId="aba2bb6a-d5d4-4ac4-ad0e-f0e5754b6af9" />
+                <Object Name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0" />
+                <Object Name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5" />
               </Folder>
+              <Object Name="update" ObjectId="f0d9947b-4fbb-4cc4-a5c0-37bbcbdc6adf" />
             </Object>
           </Folder>
           <Folder Name="GlobalConstants">
