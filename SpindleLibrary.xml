@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-10T16:55:54.447342" />
-  <contentHeader name="CODEYS Common Library Template" version="3.5.15.30" modificationDateTime="2022-10-10T16:55:40.8571917" organization="3S - Smart Software Solutions GmbH" author="3S - Smart Software Solutions GmbH">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T10:26:09.7494793" />
+  <contentHeader name="CODEYS Common Library Template" version="3.5.15.30" modificationDateTime="2022-10-11T10:25:48.356868" organization="3S - Smart Software Solutions GmbH" author="3S - Smart Software Solutions GmbH">
     <Comment>Library project template with all possible element types, docu and a sample project structure</Comment>
     <coordinateInfo>
       <fbd>
@@ -119,21 +119,6 @@
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="writeRamps" ObjectId="b78404c2-3198-49d5-a394-9df1dac92d89">
-              <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
-              </interface>
-              <body>
-                <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-                </ST>
-              </body>
-              <addData />
-            </Method>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="wasChanged" ObjectId="6d3e78d9-0d30-45a1-884a-a772c6399957">
               <interface>
                 <returnType>
@@ -149,7 +134,7 @@
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627">
+            <Method name="writeRamps" ObjectId="b78404c2-3198-49d5-a394-9df1dac92d89">
               <interface>
                 <returnType>
                   <BOOL />
@@ -186,7 +171,7 @@
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0">
+            <Method name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5">
               <interface />
               <body>
                 <ST>
@@ -197,7 +182,22 @@
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5">
+            <Method name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0">
               <interface />
               <body>
                 <ST>
@@ -978,17 +978,23 @@ END_IF</xhtml>
               </Folder>
             </Object>
             <Object Name="AnalogSpindle" ObjectId="eb76969c-c174-4116-a74f-1f579b1c095f">
-              <Object Name="isError" ObjectId="91da8d3f-395f-407d-a40c-7c7ee066fe17" />
-              <Object Name="errorReset" ObjectId="4c45ac57-8867-45ba-b93f-2cb214b4ff31" />
-              <Object Name="writeRamps" ObjectId="b78404c2-3198-49d5-a394-9df1dac92d89" />
-              <Object Name="wasChanged" ObjectId="6d3e78d9-0d30-45a1-884a-a772c6399957" />
-              <Object Name="isPowerOn" ObjectId="256c28d3-fce5-4145-8014-8183b5b90b60" />
-              <Object Name="isSpindleStopped" ObjectId="1f638665-ba1e-4c52-8d8f-f59eeb4a81e8" />
-              <Object Name="isSpindleTargetReached" ObjectId="2e54a297-7a82-4ff6-8957-ba66aeebbcae" />
-              <Object Name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627" />
-              <Object Name="runSpindle" ObjectId="aba2bb6a-d5d4-4ac4-ad0e-f0e5754b6af9" />
-              <Object Name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0" />
-              <Object Name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5" />
+              <Folder Name="ErrorInterface">
+                <Object Name="errorReset" ObjectId="4c45ac57-8867-45ba-b93f-2cb214b4ff31" />
+                <Object Name="isError" ObjectId="91da8d3f-395f-407d-a40c-7c7ee066fe17" />
+              </Folder>
+              <Folder Name="RampsInterface">
+                <Object Name="wasChanged" ObjectId="6d3e78d9-0d30-45a1-884a-a772c6399957" />
+                <Object Name="writeRamps" ObjectId="b78404c2-3198-49d5-a394-9df1dac92d89" />
+              </Folder>
+              <Folder Name="MotionInterface">
+                <Object Name="runSpindle" ObjectId="aba2bb6a-d5d4-4ac4-ad0e-f0e5754b6af9" />
+                <Object Name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5" />
+                <Object Name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627" />
+                <Object Name="isPowerOn" ObjectId="256c28d3-fce5-4145-8014-8183b5b90b60" />
+                <Object Name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0" />
+                <Object Name="isSpindleStopped" ObjectId="1f638665-ba1e-4c52-8d8f-f59eeb4a81e8" />
+                <Object Name="isSpindleTargetReached" ObjectId="2e54a297-7a82-4ff6-8957-ba66aeebbcae" />
+              </Folder>
             </Object>
           </Folder>
           <Folder Name="GlobalConstants">
