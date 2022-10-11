@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T11:21:12.4775011" />
-  <contentHeader name="CODEYS Common Library Template" version="3.5.15.30" modificationDateTime="2022-10-11T11:20:58.5613327" organization="3S - Smart Software Solutions GmbH" author="3S - Smart Software Solutions GmbH">
-    <Comment>Library project template with all possible element types, docu and a sample project structure</Comment>
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T11:31:50.4211547" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-11T11:31:29.2813486" organization="Induprogress" author="Piotr Gliszczyński">
+    <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -17,12 +17,12 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Author" type="string">3S - Smart Software Solutions GmbH</property>
+          <property name="Author" type="string">Piotr Gliszczyński</property>
           <property name="AutoResolveUnbound" type="boolean">true</property>
-          <property name="Company" type="string">3S - Smart Software Solutions GmbH</property>
+          <property name="Company" type="string">Induprogress</property>
           <property name="CompiledLibraryCompatibilityVersion" type="string">DIADesigner-AX 1.3</property>
-          <property name="DefaultNamespace" type="string">TMP</property>
-          <property name="Description" type="string">Library project template with all possible element types, docu and a sample project structure</property>
+          <property name="DefaultNamespace" type="string">SpindleLib</property>
+          <property name="Description" type="string">This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</property>
           <property name="DocFormat" type="string">reStructuredText</property>
           <property name="IsEndUserLibrary" type="boolean">false</property>
           <property name="LanguageModelAttribute" type="string">qualified-access-only</property>
@@ -30,7 +30,7 @@
           <property name="Project" type="string">SpindleLibrary</property>
           <property name="Released" type="boolean">false</property>
           <property name="SourceLibrary" type="boolean">false</property>
-          <property name="Title" type="string">CODEYS Common Library Template</property>
+          <property name="Title" type="string">SpindleLib</property>
           <property name="Version" type="version">3.5.15.30</property>
           <property name="library-category-list" type="library-category-list" />
         </ProjectInformation>
