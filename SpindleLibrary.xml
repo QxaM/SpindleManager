@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T17:44:28.9707581" />
-  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-11T17:42:34.7019183" organization="Induprogress" author="Piotr Gliszczyński">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-11T17:52:11.7411845" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-11T17:52:01.4964483" organization="Induprogress" author="Piotr Gliszczyński">
     <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
@@ -645,6 +645,207 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>4b3835e6-75fc-4380-b373-2ae5a4dc52fa</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="EthercatSpindle" pouType="functionBlock">
+        <interface>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/pouinheritance" handleUnknown="implementation">
+              <Inheritance>
+                <Extends>SpindleManager</Extends>
+              </Inheritance>
+            </data>
+          </addData>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="errorReset" ObjectId="aaa21ad0-ef17-40c0-bde6-9103ccb7360b">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="writeRamps" ObjectId="b17786e6-4f82-4deb-a282-1f13cd1af3f8">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="wasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="runSpindle" ObjectId="a7050d44-24da-48af-8bf4-a94604df645c">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+                <inputVars>
+                  <variable name="i_setPosition">
+                    <type>
+                      <INT />
+                    </type>
+                  </variable>
+                </inputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a">
+              <interface />
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="setPowerOff" ObjectId="d7ad8290-07d4-4953-b7ec-99f6326f0330">
+              <interface />
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/property" handleUnknown="implementation">
+            <Property name="isError" ObjectId="3a5d3c00-b68d-4563-9a6a-2d4c9e445b1e">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <GetAccessor>
+                <interface />
+                <body>
+                  <ST>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                  </ST>
+                </body>
+                <addData />
+              </GetAccessor>
+              <addData />
+            </Property>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/property" handleUnknown="implementation">
+            <Property name="isPowerOn" ObjectId="ff750294-6883-41b2-bd86-2b8573ee1354">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <GetAccessor>
+                <interface />
+                <body>
+                  <ST>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                  </ST>
+                </body>
+                <addData />
+              </GetAccessor>
+              <addData />
+            </Property>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/property" handleUnknown="implementation">
+            <Property name="isSpindleStopped" ObjectId="91552020-df1d-446e-afe6-14b01971e929">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <GetAccessor>
+                <interface />
+                <body>
+                  <ST>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                  </ST>
+                </body>
+                <addData />
+              </GetAccessor>
+              <addData />
+            </Property>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/property" handleUnknown="implementation">
+            <Property name="isSpindleTargetReached" ObjectId="48213404-46b2-433e-91de-fce960d251f3">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <GetAccessor>
+                <interface />
+                <body>
+                  <ST>
+                    <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                  </ST>
+                </body>
+                <addData />
+              </GetAccessor>
+              <addData />
+            </Property>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b7590e5d-acd6-4c71-a2fd-808fdd3b94f6</ObjectId>
           </data>
         </addData>
       </pou>
@@ -1390,6 +1591,19 @@ setPowerOff();
                 <Object Name="isSpindleTargetReached" ObjectId="edacb644-5f10-4fe2-a4cc-0c5f296acdb8" />
               </Folder>
               <Object Name="update" ObjectId="b91aa904-44c4-4671-b23d-285d02b81b35" />
+            </Object>
+            <Object Name="EthercatSpindle" ObjectId="b7590e5d-acd6-4c71-a2fd-808fdd3b94f6">
+              <Object Name="isError" ObjectId="3a5d3c00-b68d-4563-9a6a-2d4c9e445b1e" />
+              <Object Name="errorReset" ObjectId="aaa21ad0-ef17-40c0-bde6-9103ccb7360b" />
+              <Object Name="writeRamps" ObjectId="b17786e6-4f82-4deb-a282-1f13cd1af3f8" />
+              <Object Name="wasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2" />
+              <Object Name="isPowerOn" ObjectId="ff750294-6883-41b2-bd86-2b8573ee1354" />
+              <Object Name="isSpindleStopped" ObjectId="91552020-df1d-446e-afe6-14b01971e929" />
+              <Object Name="isSpindleTargetReached" ObjectId="48213404-46b2-433e-91de-fce960d251f3" />
+              <Object Name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7" />
+              <Object Name="runSpindle" ObjectId="a7050d44-24da-48af-8bf4-a94604df645c" />
+              <Object Name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a" />
+              <Object Name="setPowerOff" ObjectId="d7ad8290-07d4-4953-b7ec-99f6326f0330" />
             </Object>
           </Folder>
           <Folder Name="GlobalConstants">
