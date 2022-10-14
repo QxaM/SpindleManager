@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-13T18:53:31.6037479" />
-  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-13T18:53:23.1821107" organization="Induprogress" author="Piotr Gliszczyński">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-14T15:57:46.4582257" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-14T15:55:22.8555677" organization="Induprogress" author="Piotr Gliszczyński">
     <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
@@ -674,14 +674,6 @@ END_IF</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="i_maxVelocity">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="Constants.DEFAULT_MAX_VELOCITY" />
-              </initialValue>
-            </variable>
             <variable name="i_accTime">
               <type>
                 <REAL />
@@ -711,6 +703,117 @@ END_IF</xhtml>
               </type>
             </variable>
           </outputVars>
+          <localVars>
+            <variable name="OperationalDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="ReadAccRamp">
+              <type>
+                <derived name="ETC_CO_SdoRead" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="wIndex">
+                    <simpleValue value="16#3001" />
+                  </value>
+                  <value member="bySubindex">
+                    <simpleValue value="16#D" />
+                  </value>
+                  <value member="pBuffer">
+                    <simpleValue value="ADR(accTimeRead)" />
+                  </value>
+                  <value member="szSize">
+                    <simpleValue value="SIZEOF(accTimeRead)" />
+                  </value>
+                </structValue>
+              </initialValue>
+            </variable>
+            <variable name="ReadDccRamp">
+              <type>
+                <derived name="ETC_CO_SdoRead" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="wIndex">
+                    <simpleValue value="16#3001" />
+                  </value>
+                  <value member="bySubindex">
+                    <simpleValue value="16#E" />
+                  </value>
+                  <value member="pBuffer">
+                    <simpleValue value="ADR(dccTimeRead)" />
+                  </value>
+                  <value member="szSize">
+                    <simpleValue value="SIZEOF(dccTimeRead)" />
+                  </value>
+                </structValue>
+              </initialValue>
+            </variable>
+            <variable name="accTimeRead">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="dccTimeRead">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="WriteAccRamp">
+              <type>
+                <derived name="ETC_CO_SdoWrite" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="wIndex">
+                    <simpleValue value="16#604F" />
+                  </value>
+                  <value member="bySubindex">
+                    <simpleValue value="16#0" />
+                  </value>
+                  <value member="pBuffer">
+                    <simpleValue value="ADR(accRamp)" />
+                  </value>
+                  <value member="szSize">
+                    <simpleValue value="SIZEOF(accRamp)" />
+                  </value>
+                </structValue>
+              </initialValue>
+            </variable>
+            <variable name="WriteDccRamp">
+              <type>
+                <derived name="ETC_CO_SdoWrite" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="wIndex">
+                    <simpleValue value="16#6050" />
+                  </value>
+                  <value member="bySubindex">
+                    <simpleValue value="16#0" />
+                  </value>
+                  <value member="pBuffer">
+                    <simpleValue value="ADR(dccRamp)" />
+                  </value>
+                  <value member="szSize">
+                    <simpleValue value="SIZEOF(dccRamp)" />
+                  </value>
+                </structValue>
+              </initialValue>
+            </variable>
+            <variable name="accRamp">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+            <variable name="dccRamp">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+          </localVars>
           <addData>
             <data name="http://www.3s-software.com/plcopenxml/pouinheritance" handleUnknown="implementation">
               <Inheritance>
@@ -721,7 +824,7 @@ END_IF</xhtml>
         </interface>
         <body>
           <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">IF i_drive.wState = ETCStack.ETC_SLAVE_STATE.ETC_SLAVE_OPERATIONAL THEN
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">IF OperationalDelay.Q THEN
 	SUPER^( i_runCW := THIS^.i_runCW,
 			i_runCCW := THIS^.i_runCCW,
 			i_reset := THIS^.i_reset,
@@ -730,7 +833,33 @@ END_IF</xhtml>
 			q_error =&gt; THIS^.q_error,
 			q_spindleStopped =&gt; THIS^.q_spindleStopped,
 			q_spindleTargetReached =&gt; THIS^.q_spindleTargetReached);
-END_IF;</xhtml>
+END_IF;
+
+OperationalDelay(IN:= (i_drive.wState = ETCStack.ETC_SLAVE_STATE.ETC_SLAVE_OPERATIONAL), PT:= T#1S);
+
+ReadAccRamp(
+	usiCom:= 1, 
+	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
+	usiChannel:= 1,
+	udiTimeOut := 100);
+
+ReadDccRamp(
+	usiCom:= 1, 
+	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
+	usiChannel:= 1,
+	udiTimeOut := 100);
+	
+WriteAccRamp(
+	usiCom:= 1, 
+	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
+	usiChannel:= 1, 
+	udiTimeOut:= 100 );
+	
+WriteDccRamp(
+	usiCom:= 1, 
+	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
+	usiChannel:= 1, 
+	udiTimeOut:= 100 );</xhtml>
           </ST>
         </body>
         <addData>
@@ -743,10 +872,40 @@ END_IF;</xhtml>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.7 := TRUE;
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.7 := isError;
 IF NOT isError THEN
 	errorReset := TRUE;
-	THIS^.q_controlWord.7 := FALSE;
+END_IF </xhtml>
+                </ST>
+              </body>
+              <addData />
+            </Method>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
+            <Method name="writeRamps" ObjectId="b17786e6-4f82-4deb-a282-1f13cd1af3f8">
+              <interface>
+                <returnType>
+                  <BOOL />
+                </returnType>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.accRamp := TO_DINT(1000 * THIS^.i_accTime);
+THIS^.dccRamp := TO_DINT(1000 * THIS^.i_dccTime);
+
+THIS^.WriteAccRamp.xExecute := TRUE;
+
+IF THIS^.WriteDccRamp.xDone OR THIS^.WriteDccRamp.xError OR THIS^.WriteAccRamp.xError THEN
+	THIS^.WriteAccRamp.xExecute := FALSE;
+	THIS^.WriteDccRamp.xExecute := FALSE;
+END_IF
+
+IF THIS^.WriteAccRamp.xDone THEN
+	THIS^.WriteDccRamp.xExecute := TRUE;
+END_IF
+
+IF THIS^.WriteDccRamp.xExecute THEN
+	writeRamps := TRUE;
 END_IF</xhtml>
                 </ST>
               </body>
@@ -759,157 +918,50 @@ END_IF</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
-                <localVars>
-                  <variable name="readRamps">
-                    <type>
-                      <BOOL />
-                    </type>
-                  </variable>
-                  <variable name="readRampsDone">
-                    <type>
-                      <BOOL />
-                    </type>
-                  </variable>
-                  <variable name="accTimeRead">
-                    <type>
-                      <INT />
-                    </type>
-                  </variable>
-                  <variable name="dccTimeRead">
-                    <type>
-                      <INT />
-                    </type>
-                  </variable>
-                  <variable name="ReadAccRamp">
-                    <type>
-                      <derived name="ETC_CO_SdoRead" />
-                    </type>
-                  </variable>
-                  <variable name="ReadDccRamp">
-                    <type>
-                      <derived name="ETC_CO_SdoRead" />
-                    </type>
-                  </variable>
-                </localVars>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">readRamps := TRUE;
-IF readRamps AND readRampsDone THEN
-	IF THIS^.i_accTime &lt;&gt; TO_REAL(accTimeRead/100) OR THIS^.i_dccTime &lt;&gt; TO_REAL(dccTimeRead/100) THEN
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.ReadAccRamp.xExecute := TRUE;
+
+IF THIS^.ReadAccRamp.xExecute AND THIS^.ReadAccRamp.xDone THEN
+	IF TO_INT(THIS^.i_accTime*100) &lt;&gt; accTimeRead THEN
+		wasChanged := TRUE;
+		THIS^.ReadAccRamp.xExecute := FALSE;
+	ELSE
+		THIS^.ReadDccRamp.xExecute := TRUE;
+	END_IF
+END_IF
+
+IF THIS^.ReadDccRamp.xExecute AND THIS^.ReadDccRamp.xDone THEN
+	IF TO_INT(THIS^.i_dccTime*100) &lt;&gt; dccTimeRead THEN
 		wasChanged := TRUE;
 	ELSE
 		wasChanged := FALSE;
 	END_IF
-	readRamps := FALSE;
 END_IF
 
-ReadAccRamp(
-	xExecute:= readRamps,  
-	usiCom:= 1, 
-	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
-	usiChannel:= 1, 
-	wIndex:= 16#3001, 
-	bySubindex:= 16#D, 
-	udiTimeOut:= 100, 
-	pBuffer:= ADR(accTimeRead), 
-	szSize:= SIZEOF(accTimeRead), 
-	xDone=&gt; , 
-	xBusy=&gt; , 
-	xError=&gt; , 
-	eError=&gt; , 
-	udiSdoAbort=&gt; , 
-	szDataRead=&gt; );
+IF THIS^.ReadDccRamp.xDone OR THIS^.ReadDccRamp.xError OR THIS^.ReadAccRamp.xError THEN
+	THIS^.ReadAccRamp.xExecute := FALSE;
+	THIS^.ReadDccRamp.xExecute := FALSE;
+END_IF
 	
-ReadDccRamp(
-	xExecute:= ReadAccRamp.xDone,  
-	usiCom:= 1, 
-	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
-	usiChannel:= 1, 
-	wIndex:= 16#3001, 
-	bySubindex:= 16#E, 
-	udiTimeOut:= 100, 
-	pBuffer:= ADR(dccTimeRead), 
-	szSize:= SIZEOF(dccTimeRead), 
-	xDone=&gt; readRampsDone, 
-	xBusy=&gt; , 
-	xError=&gt; , 
-	eError=&gt; , 
-	udiSdoAbort=&gt; , 
-	szDataRead=&gt; );
-	</xhtml>
+
+</xhtml>
                 </ST>
               </body>
               <addData />
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="writeRamps" ObjectId="b17786e6-4f82-4deb-a282-1f13cd1af3f8">
+            <Method name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7">
               <interface>
                 <returnType>
                   <BOOL />
                 </returnType>
-                <localVars>
-                  <variable name="WriteAccRamp">
-                    <type>
-                      <derived name="ETC_CO_SdoWrite" />
-                    </type>
-                  </variable>
-                  <variable name="writeAcc">
-                    <type>
-                      <BOOL />
-                    </type>
-                  </variable>
-                  <variable name="accRamp">
-                    <type>
-                      <DINT />
-                    </type>
-                  </variable>
-                  <variable name="dccRamp">
-                    <type>
-                      <DINT />
-                    </type>
-                  </variable>
-                  <variable name="WriteDccRamp">
-                    <type>
-                      <derived name="ETC_CO_SdoWrite" />
-                    </type>
-                  </variable>
-                </localVars>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">accRamp := TO_DINT(THIS^.i_maxVelocity / THIS^.i_accTime);
-dccRamp := TO_DINT(THIS^.i_maxVelocity / THIS^.i_dccTime);
-writeAcc := TRUE;
-IF WriteDccRamp.xDone THEN
-	writeRamps := TRUE;
-	writeAcc := FALSE;
-ELSE
-	writeRamps := FALSE;
-END_IF
-
-WriteAccRamp(
-	xExecute:= writeAcc, 
-	usiCom:= 1, 
-	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
-	usiChannel:= 1, 
-	wIndex:= 16#604F, 
-	bySubindex:= 16#0, 
-	udiTimeOut:= 100, 
-	pBuffer:= ADR(accRamp), 
-	szSize:= SIZEOF(accRamp) );
-	
-WriteDccRamp(
-	xExecute:= WriteAccRamp.xDone, 
-	usiCom:= 1, 
-	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
-	usiChannel:= 1, 
-	wIndex:= 16#6050, 
-	bySubindex:= 16#0, 
-	udiTimeOut:= 100, 
-	pBuffer:= ADR(dccRamp), 
-	szSize:= SIZEOF(dccRamp) );</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.0 := TRUE;</xhtml>
                 </ST>
               </body>
               <addData />
@@ -941,15 +993,14 @@ THIS^.q_controlWord.6 := TRUE;</xhtml>
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7">
-              <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
-              </interface>
+            <Method name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a">
+              <interface />
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.0 := TRUE;</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_targetVelocity := 0;
+THIS^.q_controlWord.4 := FALSE;
+THIS^.q_controlWord.5 := FALSE;
+THIS^.q_controlWord.6 := FALSE;</xhtml>
                 </ST>
               </body>
               <addData />
@@ -967,14 +1018,18 @@ THIS^.q_controlWord.6 := TRUE;</xhtml>
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a">
-              <interface />
+            <Method name="update" ObjectId="d957cbb8-a86d-4d34-93fd-ab1f042e0989">
+              <interface>
+                <addData>
+                  <data name="http://www.3s-software.com/plcopenxml/accessmodifiers" handleUnknown="implementation">
+                    <AccessModifiers Protected="true" />
+                  </data>
+                </addData>
+              </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_targetVelocity := 0;
-THIS^.q_controlWord.4 := FALSE;
-THIS^.q_controlWord.5 := FALSE;
-THIS^.q_controlWord.6 := FALSE;</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SUPER^.update();
+THIS^.q_actualVelocity := THIS^.i_actualVelocity;</xhtml>
                 </ST>
               </body>
               <addData />
@@ -996,24 +1051,6 @@ THIS^.q_controlWord.6 := FALSE;</xhtml>
 ELSE
 	initDrive();
 END_IF</xhtml>
-                </ST>
-              </body>
-              <addData />
-            </Method>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="update" ObjectId="d957cbb8-a86d-4d34-93fd-ab1f042e0989">
-              <interface>
-                <addData>
-                  <data name="http://www.3s-software.com/plcopenxml/accessmodifiers" handleUnknown="implementation">
-                    <AccessModifiers Protected="true" />
-                  </data>
-                </addData>
-              </interface>
-              <body>
-                <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SUPER^.update();
-THIS^.q_actualVelocity := THIS^.i_actualVelocity;</xhtml>
                 </ST>
               </body>
               <addData />
@@ -1849,6 +1886,7 @@ setPowerOff();
             <Parameter Name="ETC_FOE_TIMEOUT" Value="10000" />
           </Parameters>
         </Library>
+        <Library Name="Standard, 3.5.15.0 (System)" Namespace="Standard" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" />
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>8c1463b5-02f2-427d-bd06-9e39d42fcbff</ObjectId>
@@ -1932,28 +1970,28 @@ setPowerOff();
             </Object>
             <Object Name="EthercatSpindle" ObjectId="b7590e5d-acd6-4c71-a2fd-808fdd3b94f6">
               <Folder Name="ErrorInterface">
-                <Object Name="errorReset" ObjectId="aaa21ad0-ef17-40c0-bde6-9103ccb7360b" />
                 <Object Name="isError" ObjectId="3a5d3c00-b68d-4563-9a6a-2d4c9e445b1e" />
+                <Object Name="errorReset" ObjectId="aaa21ad0-ef17-40c0-bde6-9103ccb7360b" />
               </Folder>
               <Folder Name="RampsInterface">
-                <Object Name="wasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2" />
                 <Object Name="writeRamps" ObjectId="b17786e6-4f82-4deb-a282-1f13cd1af3f8" />
+                <Object Name="wasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2" />
               </Folder>
               <Folder Name="MotionInterface">
-                <Object Name="runSpindle" ObjectId="a7050d44-24da-48af-8bf4-a94604df645c" />
-                <Object Name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7" />
-                <Object Name="setPowerOff" ObjectId="d7ad8290-07d4-4953-b7ec-99f6326f0330" />
-                <Object Name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a" />
                 <Object Name="isPowerOn" ObjectId="ff750294-6883-41b2-bd86-2b8573ee1354" />
                 <Object Name="isSpindleStopped" ObjectId="91552020-df1d-446e-afe6-14b01971e929" />
                 <Object Name="isSpindleTargetReached" ObjectId="48213404-46b2-433e-91de-fce960d251f3" />
+                <Object Name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7" />
+                <Object Name="runSpindle" ObjectId="a7050d44-24da-48af-8bf4-a94604df645c" />
+                <Object Name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a" />
+                <Object Name="setPowerOff" ObjectId="d7ad8290-07d4-4953-b7ec-99f6326f0330" />
                 <Object Name="initDrive" ObjectId="c8917508-812e-4a55-9bdd-a6551a8d8140" />
                 <Object Name="isInitialised" ObjectId="4768171f-e64d-4cfe-ba22-ad69a51c1a40" />
                 <Object Name="disableDrive" ObjectId="978fcb05-bb8e-4c43-89a7-08a90f118881" />
               </Folder>
               <Folder Name="Status">
-                <Object Name="standby" ObjectId="37665eeb-4a89-472b-b0a4-bd679754eca6" />
                 <Object Name="update" ObjectId="d957cbb8-a86d-4d34-93fd-ab1f042e0989" />
+                <Object Name="standby" ObjectId="37665eeb-4a89-472b-b0a4-bd679754eca6" />
                 <Object Name="initial" ObjectId="9ee6524a-7511-4dda-937c-9f2bd81f4bd9" />
               </Folder>
             </Object>
