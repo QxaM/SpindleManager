@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-31T16:47:52.9740156" />
-  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-31T16:47:32.2141321" organization="Induprogress" author="Piotr Gliszczyński">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-31T17:29:05.3998299" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-31T17:28:54.2963107" organization="Induprogress" author="Piotr Gliszczyński">
     <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
@@ -76,10 +76,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">i_runCW : BOOL;
-i_runCCW : BOOL;
-i_reset : BOOL;
-i_targetVelocity : INT;</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">feedback signals from drive</xhtml>
               </documentation>
             </variable>
             <variable name="i_drivePowerON">
@@ -108,16 +105,25 @@ i_targetVelocity : INT;</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">signals sent to drive</xhtml>
+              </documentation>
             </variable>
             <variable name="q_driveEnable">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Power stage enable or servo ON</xhtml>
+              </documentation>
             </variable>
             <variable name="q_driveAnalogCommand">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">analog rotating command. By default is sait to be signed, if unsigned command necessary extend and ovverride this class.</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <addData>
@@ -127,6 +133,18 @@ i_targetVelocity : INT;</xhtml>
               </Inheritance>
             </data>
           </addData>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Class that enables to create objects - analog controlled spindles. Class extends general abstract implementation of spindles, with analog handling. 
+* Class requires several additional signals from the drive - drive in error status, drive in power on status, drive stopped, drive target reached and actual veclity read from drive
+* Similarly, additional signals will be necesary to implement as outputs - drive reset, drive enable and obviously, drive analog signal.
+*
+* Class directly follows abstract class logic, if any override occurs - see description near override. Class implements Error and Motion interfaces.
+* Ramps interface is not necessary, since no ramps can be changed without communication. Ramps are set as constant in drive.
+*
+* Extend this block if any different behaviour is necessary
+</xhtml>
+          </documentation>
         </interface>
         <body>
           <ST>
@@ -147,6 +165,12 @@ i_targetVelocity : INT;</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle class method, handles error resets. IF called - outputs specific error reset output signal to the drive
+* When error is succesfully reset - returns TRUE.
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -161,7 +185,13 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface - enables output which handlesc drive power stage control 
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveEnable := TRUE;</xhtml>
@@ -180,6 +210,12 @@ END_IF</xhtml>
                     </type>
                   </variable>
                 </inputVars>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface method, handles running spindle.
+* Sets commadn to analog output and assumes signed analog output, if such implementation is not proper - override this method.
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -191,7 +227,13 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="stopSpindle" ObjectId="5c5a89c3-b037-4026-9ab5-ca7b4c2267a0">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface, handles stopping spindle by reseting (to 0) analog command
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveAnalogCommand := 0;</xhtml>
@@ -202,7 +244,13 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOff" ObjectId="aa280ff4-0896-4edd-adf4-66b219bf2ef5">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface - disables output which handlesc drive power stage control 
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveEnable := FALSE;</xhtml>
@@ -219,6 +267,11 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Overridden update method of spindle manager class. Override handles actual velocity output.
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -235,6 +288,11 @@ THIS^.q_actualVelocity := THIS^.i_driveActualVelocity;</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle class method, handles reading error input from the drive - if it's true - drive is in error
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -254,6 +312,11 @@ THIS^.q_actualVelocity := THIS^.i_driveActualVelocity;</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface - checks input feedback from drive with powerON feedback
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -273,6 +336,11 @@ THIS^.q_actualVelocity := THIS^.i_driveActualVelocity;</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface - checks input feedback from drive with spindle stopped feedback
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -292,6 +360,11 @@ THIS^.q_actualVelocity := THIS^.i_driveActualVelocity;</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Analog spindle implementation of motion interface - checks input feedback from drive with target reacehd feedback
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
