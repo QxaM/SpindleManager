@@ -1,0 +1,4 @@
+#CODESYS Ignore files#
+*.~u
+*.tgs
+*.opt

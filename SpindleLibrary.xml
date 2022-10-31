@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-14T15:57:46.4582257" />
-  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-14T15:55:22.8555677" organization="Induprogress" author="Piotr Gliszczyński">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-31T16:47:52.9740156" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-31T16:47:32.2141321" organization="Induprogress" author="Piotr Gliszczyński">
     <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
@@ -39,30 +39,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ERROR">
-        <baseType>
-          <enum>
-            <values>
-              <value name="NO_ERROR" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f13851e4-c15c-4448-a3cc-5ae43fe11b73</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">{attribute 'conditionalshow'}
-{attribute 'conditionalshow' := 'SomeText'}
-{attribute 'hide'}</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="SpindleMaganerStatus_e">
         <baseType>
           <enum>
@@ -185,11 +161,7 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOn" ObjectId="52300e2d-c6b4-4d24-b6f3-ec1a784af627">
-              <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
-              </interface>
+              <interface />
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveEnable := TRUE;</xhtml>
@@ -201,11 +173,8 @@ END_IF</xhtml>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="runSpindle" ObjectId="aba2bb6a-d5d4-4ac4-ad0e-f0e5754b6af9">
               <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
                 <inputVars>
-                  <variable name="i_setPosition">
+                  <variable name="i_setVelocity">
                     <type>
                       <INT />
                     </type>
@@ -214,7 +183,7 @@ END_IF</xhtml>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveAnalogCommand := i_setPosition;</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_driveAnalogCommand := i_setVelocity;</xhtml>
                 </ST>
               </body>
               <addData />
@@ -460,7 +429,7 @@ q_dccRamp := TO_UINT(i_dccRamp * 100);
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="wasChanged" ObjectId="069f48b2-1ec5-4c8e-8ef1-c6cefc8ebd0a">
+            <Method name="rampsWasChanged" ObjectId="069f48b2-1ec5-4c8e-8ef1-c6cefc8ebd0a">
               <interface>
                 <returnType>
                   <BOOL />
@@ -469,9 +438,9 @@ q_dccRamp := TO_UINT(i_dccRamp * 100);
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">IF (i_accRamp &lt;&gt; q_accRamp) OR (i_dccRamp &lt;&gt; q_accRamp) THEN
-	wasChanged := TRUE;
+	rampsWasChanged := TRUE;
 ELSE
-	wasChanged := FALSE;
+	rampsWasChanged := FALSE;
 END_IF</xhtml>
                 </ST>
               </body>
@@ -480,11 +449,7 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOn" ObjectId="0f8a25f2-8955-4e1d-8197-ba258f7af758">
-              <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
-              </interface>
+              <interface />
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.0 := FALSE;
@@ -497,11 +462,8 @@ THIS^.q_controlWord.1 := TRUE;</xhtml>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="runSpindle" ObjectId="a587d9a3-d206-409c-9ff5-d32d8c4aa1b1">
               <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
                 <inputVars>
-                  <variable name="i_setPosition">
+                  <variable name="i_setVelocity">
                     <type>
                       <INT />
                     </type>
@@ -510,14 +472,14 @@ THIS^.q_controlWord.1 := TRUE;</xhtml>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">IF i_setPosition &gt;= 0 THEN
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">IF i_setVelocity &gt;= 0 THEN
 	THIS^.q_controlWord.4 := TRUE;
 	THIS^.q_controlWord.5 := FALSE;
-	THIS^.q_frequencyCommand := i_setPosition;
+	THIS^.q_frequencyCommand := i_setVelocity;
 ELSE
 	THIS^.q_controlWord.4 := FALSE;
 	THIS^.q_controlWord.5 := TRUE;
-	THIS^.q_frequencyCommand := -i_setPosition;
+	THIS^.q_frequencyCommand := -i_setVelocity;
 END_IF</xhtml>
                 </ST>
               </body>
@@ -913,7 +875,7 @@ END_IF</xhtml>
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="wasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2">
+            <Method name="rampsWasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2">
               <interface>
                 <returnType>
                   <BOOL />
@@ -925,7 +887,7 @@ END_IF</xhtml>
 
 IF THIS^.ReadAccRamp.xExecute AND THIS^.ReadAccRamp.xDone THEN
 	IF TO_INT(THIS^.i_accTime*100) &lt;&gt; accTimeRead THEN
-		wasChanged := TRUE;
+		rampsWasChanged := TRUE;
 		THIS^.ReadAccRamp.xExecute := FALSE;
 	ELSE
 		THIS^.ReadDccRamp.xExecute := TRUE;
@@ -934,9 +896,9 @@ END_IF
 
 IF THIS^.ReadDccRamp.xExecute AND THIS^.ReadDccRamp.xDone THEN
 	IF TO_INT(THIS^.i_dccTime*100) &lt;&gt; dccTimeRead THEN
-		wasChanged := TRUE;
+		rampsWasChanged := TRUE;
 	ELSE
-		wasChanged := FALSE;
+		rampsWasChanged := FALSE;
 	END_IF
 END_IF
 
@@ -954,11 +916,7 @@ END_IF
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7">
-              <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
-              </interface>
+              <interface />
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.0 := TRUE;</xhtml>
@@ -970,11 +928,8 @@ END_IF
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="runSpindle" ObjectId="a7050d44-24da-48af-8bf4-a94604df645c">
               <interface>
-                <returnType>
-                  <BOOL />
-                </returnType>
                 <inputVars>
-                  <variable name="i_setPosition">
+                  <variable name="i_setVelocity">
                     <type>
                       <INT />
                     </type>
@@ -983,7 +938,7 @@ END_IF
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_targetVelocity := i_setPosition;
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_targetVelocity := i_setVelocity;
 THIS^.q_controlWord.4 := TRUE;
 THIS^.q_controlWord.5 := TRUE;
 THIS^.q_controlWord.6 := TRUE;</xhtml>
@@ -1223,8 +1178,11 @@ SUPER^.initial();</xhtml>
             </variable>
             <variable name="i_targetVelocity">
               <type>
-                <INT />
+                <UINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Target rotating speed in RPM</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -1232,6 +1190,9 @@ SUPER^.initial();</xhtml>
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Actual rotating speed in RPM</xhtml>
+              </documentation>
             </variable>
             <variable name="q_error">
               <type>
@@ -1242,11 +1203,17 @@ SUPER^.initial();</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Spindle is stopped and power stage is either ON or OFF</xhtml>
+              </documentation>
             </variable>
             <variable name="q_spindleTargetReached">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Target rotating speed has been reached </xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -1276,18 +1243,34 @@ SUPER^.initial();</xhtml>
               </Inheritance>
             </data>
           </addData>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Abstract class that represents general spindle. Spindle can be controlled via communication or analog signals - more precise implementation determines behaviour.
+* Generally, spindle usage in CNC machines is rather simple and in most applications it is only simple starting and stopping of the spindle.
+* This block represents this with spindle state machine, that could be - initialization, stadby, powered on, working - either CW or CCW, stopping or in error.
+* Furthermore couple of interfaces are implemented to include certain functionality - such as error handling or ramps handling.
+*
+* Block also requires certain inputs - run CW or CCW, reset and target speed of spindle in RPM and on the other hands return output with actual velocity,
+* error status, and spindle status (stopped or target reached). Additionally - actual velocity output does not have any implementation in abstract class, 
+* since implementation might differ from spindle to spindle, yet the output is common to every spindle. Thus, developer have to implement it explicitly.
+*
+* Any other functionality (such as tool change positioning in more advanced spindles) or spindle behaviour can be achieved by extending this class.
+*
+* Override any class methods if implemented funcionality is too abstract or different behaviour is necessary.
+</xhtml>
+          </documentation>
         </interface>
         <body>
           <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">update();
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">update(); //generally used for cyclic updating certain parameters - ie. ramps or status
 
 CASE status OF
 	SpindleMaganerStatus_e.INIT:
-		initial();
+		initial(); //first cycles of the block or reset after error
 	SpindleMaganerStatus_e.STANDBY:
-		standby();
+		standby(); //drive has no error and is waiting ready for powering on
 	SpindleMaganerStatus_e.POWER_ON:
-		powerOn();
+		powerOn(); //drive is power and automatically goes into running state - either CW or CCW
 	SpindleMaganerStatus_e.WORKING_CW:
 		workingCW();
 	SpindleMaganerStatus_e.WORKING_CCW:
@@ -1308,21 +1291,31 @@ END_CASE</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle manager abstract class method, handles updates of spindle manager. Updates status, ramps and outputs of this fb.
+* Additionally, if error occurs - proceeds to error state
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.status := THIS^.nextStatus;
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">//state machine status updates handling
+THIS^.status := THIS^.nextStatus;
 
+//error handling
 IF NOT (status = SpindleMaganerStatus_e.INIT) THEN
 	IF isError THEN
 		nextStatus := SpindleMaganerStatus_e.ERROR;
 	END_IF
 END_IF;
 
-IF wasChanged() THEN
+//ramps updates if changed
+IF rampsWasChanged() THEN
 	writeRamps();
 END_IF
 
+//output handling
 THIS^.q_error := isError;
 THIS^.q_spindleStopped := isSpindleStopped;
 THIS^.q_spindleTargetReached := isSpindleTargetReached;</xhtml>
@@ -1342,6 +1335,12 @@ THIS^.q_spindleTargetReached := isSpindleTargetReached;</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle manager abstact class method, handles initial state of spindle. If there are errors on the drives - the drive is reset and ramps are written.
+* Spindle then proceeds to standby state. If no error is present - only ramps are written and the proceeds to standby state
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1352,7 +1351,9 @@ THIS^.q_spindleTargetReached := isSpindleTargetReached;</xhtml>
 		END_IF
 	END_IF
 ELSE
-	THIS^.nextStatus := SpindleMaganerStatus_e.STANDBY;
+	IF writeRamps() THEN
+		THIS^.nextStatus := SpindleMaganerStatus_e.STANDBY;
+	END_IF
 END_IF</xhtml>
                 </ST>
               </body>
@@ -1383,14 +1384,14 @@ END_IF</xhtml>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">writeRamps := TRUE;</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">writeRamps := TRUE; //default implementation of the ramps for drives without ramps chaning or changing via drive parameters by service</xhtml>
                 </ST>
               </body>
               <addData />
             </Method>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
-            <Method name="wasChanged" ObjectId="edec4948-06f6-46da-bd13-def5b80587ec">
+            <Method name="rampsWasChanged" ObjectId="edec4948-06f6-46da-bd13-def5b80587ec">
               <interface>
                 <returnType>
                   <BOOL />
@@ -1398,7 +1399,7 @@ END_IF</xhtml>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">wasChanged := FALSE;</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">rampsWasChanged := FALSE; //default implementation of the ramps for drives without ramps chaning or changing via drive parameters by service</xhtml>
                 </ST>
               </body>
               <addData />
@@ -1412,6 +1413,11 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle manager abstact class method, handles spindle in standby state. Generally, spindle is idle - wating for runnign command. Then proceeds to power on status
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1431,6 +1437,12 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle manager abstract class method, handles spindle in power on status. If drive is not powered on - enables power.
+* Otherwise, proceeds to next states, which are either - working in any direction or stopping if run command is no longer present.
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1473,11 +1485,17 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle manager abstract class method, handles spindle in working in CW direction state. Enables the rotation with target velocity.
+* If direction command changes, directly switches the state. IF no command is present - proceeds to stopping state
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">runSpindle(THIS^.i_targetVelocity);
-IF THIS^.i_runCCW THEN
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">runSpindle(TO_INT(THIS^.i_targetVelocity));
+IF NOT THIS^.i_runCW AND THIS^.i_runCCW THEN
 	nextStatus := SpindleMaganerStatus_e.WORKING_CCW;
 ELSIF NOT THIS^.i_runCW AND NOT THIS^.i_runCCW THEN
 	nextStatus := SpindleMaganerStatus_e.STOPPING;
@@ -1517,11 +1535,18 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle manager abstract class method, handles spindle in working in CW direction state. Enables the rotation with target velocity.
+* Direction of rotating is handled by reversing target velocity command.
+* If direction command changes, directly switches the state. IF no command is present - proceeds to stopping state
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">runSpindle(-THIS^.i_targetVelocity);
-IF THIS^.i_runCW THEN
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">runSpindle(-TO_INT(THIS^.i_targetVelocity));
+IF NOT THIS^.i_runCCW AND THIS^.i_runCW THEN
 	nextStatus := SpindleMaganerStatus_e.WORKING_CW;
 ELSIF NOT THIS^.i_runCW AND NOT THIS^.i_runCCW THEN
 	nextStatus := SpindleMaganerStatus_e.STOPPING;
@@ -1539,6 +1564,12 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindla manager abstract class method, handles spindle in stopping state - disabels rotation of the spindle and when spindle is stopped, disables power stage
+* If spindle power stage is disabled - proceeds to standby state
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1586,6 +1617,11 @@ END_IF</xhtml>
                     <AccessModifiers Protected="true" />
                   </data>
                 </addData>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Spindle Manager abstract class method, that handles spindle in error state. Disables stop and power on commands and waits for reset to change to initial state
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1696,6 +1732,9 @@ setPowerOff();
           <initialValue>
             <simpleValue value="0.5" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">default ramp time in seconds</xhtml>
+          </documentation>
         </variable>
         <variable name="SP_DEFAULT_STATUS">
           <type>
@@ -1704,6 +1743,9 @@ setPowerOff();
           <initialValue>
             <simpleValue value="SpindleMaganerStatus_e.DEFAULT" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">default status of spindle state machine</xhtml>
+          </documentation>
         </variable>
         <variable name="DEFAULT_MAX_VELOCITY">
           <type>
@@ -1712,6 +1754,9 @@ setPowerOff();
           <initialValue>
             <simpleValue value="1500" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">default max rotating speed of a spindle motor in RPM</xhtml>
+          </documentation>
         </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -1730,30 +1775,6 @@ setPowerOff();
         </documentation>
       </globalVars>
     </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="Variables">
-        <variable name="g_iDummy">
-          <type>
-            <INT />
-          </type>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cd51317e-3db2-44da-bb88-6b22ca144fe3</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">{attribute 'conditionalshow'}
-{attribute 'conditionalshow' := 'SomeText'}
-{attribute 'hide'}</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
     <data name="http://www.3s-software.com/plcopenxml/interface" handleUnknown="implementation">
       <Interface name="ErrorInterface" ObjectId="7f29e168-bb89-495a-a3ae-8cb75aa464ff">
         <Methods>
@@ -1762,6 +1783,11 @@ setPowerOff();
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Error interface methdo for reseting drive. If resets correctly TRUE is returned
+</xhtml>
+              </documentation>
             </interface>
             <addData />
           </Method>
@@ -1772,11 +1798,29 @@ setPowerOff();
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Error intefrace property - checks if drive is in error states and then returns TRUE
+</xhtml>
+              </documentation>
             </interface>
             <GetAccessor />
             <addData />
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Error intefrace property - checks if drive is in error states and then returns TRUE
+</xhtml>
+            </documentation>
           </Property>
         </Properties>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* An interface used for error handling of spindle drives. Allows for reading if drive is in error state and allows to reset the drive.
+* ie. checks if controlword has error bit set
+* 
+* Extend if additional functionality needed - ie. warning codes decoding, etc.
+</xhtml>
+        </documentation>
         <addData />
       </Interface>
     </data>
@@ -1785,33 +1829,50 @@ setPowerOff();
         <Methods>
           <Method name="setPowerOn" ObjectId="4811d434-1d4f-4743-b9d9-92c43ff86d0f">
             <interface>
-              <returnType>
-                <BOOL />
-              </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface method, implementation allows to enable power stage of the drive
+</xhtml>
+              </documentation>
             </interface>
             <addData />
           </Method>
           <Method name="runSpindle" ObjectId="7e8c41a1-c12f-42e6-8b20-685de7878eae">
             <interface>
-              <returnType>
-                <BOOL />
-              </returnType>
               <inputVars>
-                <variable name="i_setPosition">
+                <variable name="i_setVelocity">
                   <type>
                     <INT />
                   </type>
                 </variable>
               </inputVars>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface method allows to run the spindle with set velocity.
+* Set velocity is signed integer variable. Chaning rotation variable is executed by changing set velocity sign.
+</xhtml>
+              </documentation>
             </interface>
             <addData />
           </Method>
           <Method name="stopSpindle" ObjectId="1ddeeab4-2363-4c7d-9df7-40a2b8e8ce88">
-            <interface />
+            <interface>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface property, implementation allows to stop rotation of the drive - without disabling power stage.
+</xhtml>
+              </documentation>
+            </interface>
             <addData />
           </Method>
           <Method name="setPowerOff" ObjectId="217dcb48-2cf4-43bc-adad-add58980105c">
-            <interface />
+            <interface>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface method implementation allows to disable power stage of the drive
+</xhtml>
+              </documentation>
+            </interface>
             <addData />
           </Method>
         </Methods>
@@ -1821,29 +1882,65 @@ setPowerOff();
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface property, implementation allows to check whether drive's power stage is enabled.
+</xhtml>
+              </documentation>
             </interface>
             <GetAccessor />
             <addData />
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface property, implementation allows to check whether drive's power stage is enabled.
+</xhtml>
+            </documentation>
           </Property>
           <Property name="isSpindleStopped" ObjectId="771cd78d-51bd-4f14-93af-3e72d3910bec">
             <interface>
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface propert, implementation allows to check whether drive is stopped - either with or without power stage enabled
+</xhtml>
+              </documentation>
             </interface>
             <GetAccessor />
             <addData />
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface propert, implementation allows to check whether drive is stopped - either with or without power stage enabled
+</xhtml>
+            </documentation>
           </Property>
           <Property name="isSpindleTargetReached" ObjectId="fb56d40c-c306-4c30-89e1-e90c0b73fb13">
             <interface>
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface property, implementation allows to check whtether target speed, set with runSpindle method, is already reached
+</xhtml>
+              </documentation>
             </interface>
             <GetAccessor />
             <addData />
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface property, implementation allows to check whtether target speed, set with runSpindle method, is already reached
+</xhtml>
+            </documentation>
           </Property>
         </Properties>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Motion interface allows for implementation motion related methods - ie. powering On or running the spindle. Implements also sets of motion state checks -
+* - Power on status or target reached status.
+</xhtml>
+        </documentation>
         <addData />
       </Interface>
     </data>
@@ -1855,18 +1952,37 @@ setPowerOff();
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Ramps inteface method used for writing ramps to the drive. If written succesfully TRUE is returned.
+</xhtml>
+              </documentation>
             </interface>
             <addData />
           </Method>
-          <Method name="wasChanged" ObjectId="84bf83ba-8123-40d8-9c1d-7a44fe56d747">
+          <Method name="rampsWasChanged" ObjectId="84bf83ba-8123-40d8-9c1d-7a44fe56d747">
             <interface>
               <returnType>
                 <BOOL />
               </returnType>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Ramps interface method for checking if actual ramps in the drive are different, than currently entered by user.
+* If yes - TRUE is returned.
+</xhtml>
+              </documentation>
             </interface>
             <addData />
           </Method>
         </Methods>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* An interface for handling ramps in spindle drives. It is generally used for writing ramps via communication (EtherCAT, Modbus, etc.).
+* Interface checks if ramps entered by user are different(method - rampsWasChanged), than actual in the drive. If yes - user defined ramps are written to the drive (method - writeRamps).
+*
+* If more functionality is necessary - extend this interface (ie. explicit ramps read to push to other functions)
+</xhtml>
+        </documentation>
         <addData />
       </Interface>
     </data>
@@ -1899,7 +2015,6 @@ setPowerOff();
         <Object Name="Library Manager" ObjectId="8c1463b5-02f2-427d-bd06-9e39d42fcbff" />
         <Folder Name="SpindleLibrary">
           <Folder Name="Enums">
-            <Object Name="ERROR" ObjectId="f13851e4-c15c-4448-a3cc-5ae43fe11b73" />
             <Object Name="SpindleMaganerStatus_e" ObjectId="fdd32703-eb1d-4c4b-aa9b-533f668acbcb" />
           </Folder>
           <Folder Name="Function Blocks">
@@ -1920,7 +2035,7 @@ setPowerOff();
               </Folder>
               <Folder Name="RampsInterface">
                 <Object Name="writeRamps" ObjectId="87a71d40-fe71-4bd4-9cde-76e749e806a0" />
-                <Object Name="wasChanged" ObjectId="edec4948-06f6-46da-bd13-def5b80587ec" />
+                <Object Name="rampsWasChanged" ObjectId="edec4948-06f6-46da-bd13-def5b80587ec" />
               </Folder>
               <Folder Name="MotionInterface">
                 <Object Name="isPowerOn" ObjectId="2edafe67-b101-46a5-ab95-0f4985b50ed0" />
@@ -1955,7 +2070,7 @@ setPowerOff();
               </Folder>
               <Folder Name="RampsInterface">
                 <Object Name="writeRamps" ObjectId="46c0ac0a-6452-4fbd-b44f-da1af849b7ae" />
-                <Object Name="wasChanged" ObjectId="069f48b2-1ec5-4c8e-8ef1-c6cefc8ebd0a" />
+                <Object Name="rampsWasChanged" ObjectId="069f48b2-1ec5-4c8e-8ef1-c6cefc8ebd0a" />
               </Folder>
               <Folder Name="MotionInterface">
                 <Object Name="isPowerOn" ObjectId="70ae6658-2548-41fd-bbac-84f8c4cf4b7a" />
@@ -1975,7 +2090,7 @@ setPowerOff();
               </Folder>
               <Folder Name="RampsInterface">
                 <Object Name="writeRamps" ObjectId="b17786e6-4f82-4deb-a282-1f13cd1af3f8" />
-                <Object Name="wasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2" />
+                <Object Name="rampsWasChanged" ObjectId="3e8f1ea3-df92-4f8a-a87f-c24eb145e9a2" />
               </Folder>
               <Folder Name="MotionInterface">
                 <Object Name="isPowerOn" ObjectId="ff750294-6883-41b2-bd86-2b8573ee1354" />
@@ -1999,9 +2114,6 @@ setPowerOff();
           <Folder Name="GlobalConstants">
             <Object Name="Constants" ObjectId="61a71296-3b39-4b4c-9e67-cea520fcd5cc" />
           </Folder>
-          <Folder Name="GlobalVariables">
-            <Object Name="Variables" ObjectId="cd51317e-3db2-44da-bb88-6b22ca144fe3" />
-          </Folder>
           <Folder Name="Interfaces">
             <Object Name="ErrorInterface" ObjectId="7f29e168-bb89-495a-a3ae-8cb75aa464ff">
               <Object Name="errorReset" ObjectId="d1ceed18-4c4a-4176-a9e3-72527fe56f59" />
@@ -2009,7 +2121,7 @@ setPowerOff();
             </Object>
             <Object Name="RampsInterface" ObjectId="fbfe0586-384e-4a6c-a390-c3029cd16974">
               <Object Name="writeRamps" ObjectId="6f5efd40-77a4-48a1-99cb-1910e0a0a68a" />
-              <Object Name="wasChanged" ObjectId="84bf83ba-8123-40d8-9c1d-7a44fe56d747" />
+              <Object Name="rampsWasChanged" ObjectId="84bf83ba-8123-40d8-9c1d-7a44fe56d747" />
             </Object>
             <Object Name="MotionInterface" ObjectId="d287cc99-46c6-4f20-924e-f9b04710655a">
               <Object Name="setPowerOn" ObjectId="4811d434-1d4f-4743-b9d9-92c43ff86d0f" />
