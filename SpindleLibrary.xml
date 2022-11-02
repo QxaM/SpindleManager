@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-10-31T17:55:14.2518192" />
-  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-10-31T17:55:03.7168032" organization="Induprogress" author="Piotr Gliszczyński">
+  <fileHeader companyName="Delta Electronics, Inc." productName="DIADesigner-AX" productVersion="DIADesigner-AX 1.3" creationDateTime="2022-11-02T12:51:38.0765464" />
+  <contentHeader name="SpindleLib" version="3.5.15.30" modificationDateTime="2022-11-02T12:51:23.5920038" organization="Induprogress" author="Piotr Gliszczyński">
     <Comment>This Library allows to control spindles with simple FB. If you need to add another spindle option - just extend SpindleManager</Comment>
     <coordinateInfo>
       <fbd>
@@ -813,11 +813,17 @@ END_IF</xhtml>
               <type>
                 <UINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">6041h - mapped from EtherCAT device</xhtml>
+              </documentation>
             </variable>
             <variable name="i_actualVelocity">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">606Ch - mapped from EtherCAT device</xhtml>
+              </documentation>
             </variable>
             <variable name="i_accTime">
               <type>
@@ -826,6 +832,9 @@ END_IF</xhtml>
               <initialValue>
                 <simpleValue value="Constants.DEFAULT_RAMP_TIME" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> scaled in seconds</xhtml>
+              </documentation>
             </variable>
             <variable name="i_dccTime">
               <type>
@@ -834,6 +843,9 @@ END_IF</xhtml>
               <initialValue>
                 <simpleValue value="Constants.DEFAULT_RAMP_TIME" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml"> scaled in seconds</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -841,11 +853,17 @@ END_IF</xhtml>
               <type>
                 <UINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">6040h - mapped to EtherCAT device</xhtml>
+              </documentation>
             </variable>
             <variable name="q_targetVelocity">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">60FFh - mapped to EtherCAT device</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -900,11 +918,17 @@ END_IF</xhtml>
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ramps read from device </xhtml>
+              </documentation>
             </variable>
             <variable name="dccTimeRead">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ramps read from device </xhtml>
+              </documentation>
             </variable>
             <variable name="WriteAccRamp">
               <type>
@@ -952,11 +976,17 @@ END_IF</xhtml>
               <type>
                 <DINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ramps calculated by logic and sent to drive</xhtml>
+              </documentation>
             </variable>
             <variable name="dccRamp">
               <type>
                 <DINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ramps calculated by logic and sent to drive</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <addData>
@@ -966,6 +996,17 @@ END_IF</xhtml>
               </Inheritance>
             </data>
           </addData>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Class that enables to create EtherCAT controlled spindle drives. Class extends general implementation of abstract spindle manager class.
+* Class extends with etherCAT communication handling and thus needs several additional parameters maps.
+* 
+* Class needs external inputs - ETCSlave (drive), status word, actual velocity - all of which are communication parameters. Ramp inputs are also necessary
+* Class outputs controlWord and target velocity all of which have to be mapped to communication parameters of the drive.
+*
+* Class directly follows abstract class logic, whith couple exceptions necessery for communication handling. If actual functionality is not enaugh - extend this class.
+</xhtml>
+          </documentation>
         </interface>
         <body>
           <ST>
@@ -980,8 +1021,13 @@ END_IF</xhtml>
 			q_spindleTargetReached =&gt; THIS^.q_spindleTargetReached);
 END_IF;
 
+//Delay of class logic to wait for communication start
 OperationalDelay(IN:= (i_drive.wState = ETCStack.ETC_SLAVE_STATE.ETC_SLAVE_OPERATIONAL), PT:= T#1S);
 
+//SDO FBs to read and send ramps via EtherCAT
+//Default values are set, but can be changed if necessary
+//Other values have to be set as seen below
+//Unused values are unnecesary or used with FB.x operator
 ReadAccRamp(
 	usiCom:= 1, 
 	uiDevice:= THIS^.i_drive.PhysSlaveAddr, 
@@ -1014,6 +1060,12 @@ WriteDccRamp(
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Modbus spindle method implementation of error interface - handles error reset, by enabling bit 7 of controlword
+* If reset succeeds returns TRUE
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1032,6 +1084,14 @@ END_IF </xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle ramps interface method implementation - handles sending ramp times set by user to the drive
+* Ramps are set to the drive by SDO defined in FB. Both ramps are sent in one call of the method.
+*
+* Ramps sent to drive are scaled in ms and are DINTs. Input ramps have to be converted to DINT and scaled by 1000
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1063,6 +1123,15 @@ END_IF</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle ramps interface method implementation - handles checks if ramps set by user was changed, form what was read from the drive
+* If input ramps are different, than ramps currently in drive - the user have changed ramp times and method returns TRUE
+*
+* Ramps read form drive are integers with scaling 0.01s (1 = 0.01s), so additional scaling was necessary.
+* SDOs are read cyclicly in the method until both ramps were reads and boolean state of ramps is returned.
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1099,7 +1168,13 @@ END_IF
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOn" ObjectId="529b81be-4975-444e-8fe8-07985fd3e0f7">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface implementation methods - handling setting power stage ON , by seting of bit 0 of controlword
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.0 := TRUE;</xhtml>
@@ -1118,6 +1193,11 @@ END_IF
                     </type>
                   </variable>
                 </inputVars>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface implementation methods - handling running the spindle - setting target velocity and enabling operation (bits 4, 5, 6 of contorlword)
+</xhtml>
+                </documentation>
               </interface>
               <body>
                 <ST>
@@ -1132,7 +1212,14 @@ THIS^.q_controlWord.6 := TRUE;</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="stopSpindle" ObjectId="b958b4c8-bdff-49e3-af12-9f55c52c404a">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface implementation methods - handling stopping the spindle - setting target velocity to 0
+* and disabling operation (bits 4, 5, 6 of contorlword)
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_targetVelocity := 0;
@@ -1146,7 +1233,13 @@ THIS^.q_controlWord.6 := FALSE;</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="setPowerOff" ObjectId="d7ad8290-07d4-4953-b7ec-99f6326f0330">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface implementation methods - handling setting power stage OFF, by seting of bit 0 of controlword
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.0 := FALSE;</xhtml>
@@ -1196,7 +1289,14 @@ END_IF</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="initDrive" ObjectId="c8917508-812e-4a55-9bdd-a6551a8d8140">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle method, that extends standard motion interface. Via EtherCAT CiA402 drive by default is disabled (voltage is disabled, quick stop is disebled, etc)
+* The drive have to be disabled/enabled by user. This method is used to enale the drive - ie. after error reset to go back to default standby state.
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.1 := TRUE;
@@ -1209,7 +1309,14 @@ THIS^.q_controlWord.3 := TRUE;</xhtml>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/method" handleUnknown="implementation">
             <Method name="disableDrive" ObjectId="978fcb05-bb8e-4c43-89a7-08a90f118881">
-              <interface />
+              <interface>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle method, that extends standard motion interface. Via EtherCAT CiA402 drive by default is disabled (voltage is disabled, quick stop is disebled, etc)
+* The drive have to be disabled/enabled by user. This method is used to disabling the drive - ie. after error reset to go back to default standby state.
+</xhtml>
+                </documentation>
+              </interface>
               <body>
                 <ST>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">THIS^.q_controlWord.1 := FALSE;
@@ -1247,6 +1354,11 @@ SUPER^.initial();</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* Modbus spindle error interface property implementation - checks if drive reports bit 3 or 7 in status word (error or warn). If yes, then returns TRUE.
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -1266,6 +1378,12 @@ SUPER^.initial();</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface property implementation - checks if drive reports servo ON bit (bit 1 of controlwrod).
+* If yes ther returns TRUE
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -1285,6 +1403,12 @@ SUPER^.initial();</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface property implementation - checks if drive reports that is stopped.
+* Property returns value TRUE if drive reports actual velocity = 9
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -1304,6 +1428,12 @@ SUPER^.initial();</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface property implementation - checks if drive reports that target is reached and actual velocity is different than 0 -
+* then returns true
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
@@ -1323,6 +1453,12 @@ SUPER^.initial();</xhtml>
                 <returnType>
                   <BOOL />
                 </returnType>
+                <documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">
+* EtherCAT spindle motion interface property implementation - checks if drive reports proper status bits after initialisation
+* if all bits (0, 4, 5 of statusword) are present drive is initialized and method returns TRUE
+</xhtml>
+                </documentation>
               </interface>
               <GetAccessor>
                 <interface />
